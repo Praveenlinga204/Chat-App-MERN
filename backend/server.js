@@ -15,10 +15,19 @@ const server = http.createServer(app)
 app.use(cors()); 
 app.use(express.json());
 
-/* app.use("/api/auth",require("./routes/auth")); 
-app.use("/api/message",require("./routes/message")) */
+app.use("/api/auth",require("./routes/auth")); 
+app.use("/api/message",require("./routes/Messages"))
 
 //socket.io logic
+
+const userSocketMap = {};
+
+io.on("connection",(socket)=>{
+    console.log("User Connected",socket.id);
+    socket.on("User Online",(username)=>{
+        userSocketMap[username]= socket.id;
+    })
+})
 
 
 mongoose.connect(process.env.MONGO_URI).then(()=>server.listen(5000,

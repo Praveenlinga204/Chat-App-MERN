@@ -5,6 +5,7 @@ const messageSchema = new mongoose.Schema({
     receiver: { type: String, require: true },
     text: { type: String, require: true },
 },
-    { timestamps: true });
+    { timestamps: true }
 
-    module.exports = mongoose.module("Message",messageSchema)
+);
+module.exports = mongoose.model("message",messageSchema); 

@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const User = require("./models/User")
+const User = require("../modules/Users.js")
 const bcrypt = require("bcryptjs")
 const jwt = require("jsonwebtoken")
 const auth = require('../middleware/auth')
@@ -28,11 +28,23 @@ router.post('/register',async(req,res)=>{
 router.post('/login',async(req,res)=>{
     try{
         const {username,password} = req.body;
-        if(username || password) return res.status(400).json({error:
+        if(!username || !password) return res.status(400).json({error:
             "Username and Password is required"
-        })
+        });
+        const user = await User.findOne({username});
+         if(!user) return res.status(400).json({error:
+            "User not found"
+        });
+        const match = await bcrypt.compare(password,user.password);
+        if(!match) return res.status(400).json({error:
+            "Wrong Password"
+        });
+        const token = jwt.sign({id:user._id},process.env.JWT_SECRET,{expiresIn:"1d"});
+        res.json({token,username})
     }catch(err){
         console.error("Login Error",err.message)
         res.status(500).json({error:err.message})
     }
 })
+
+module.exports = router;
